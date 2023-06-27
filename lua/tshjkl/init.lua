@@ -1,10 +1,26 @@
-local trail = rerequire('tshjkl.trail')
+local trail = require('tshjkl.trail')
 
 local M = {}
 
 M.ns = vim.api.nvim_create_namespace('boop')
 
 M.hl = {}
+
+local function select_position(pos)
+  local keys = pos.start.row + 1 .. 'G0'
+
+  if pos.start.col > 0 then
+    keys = keys .. pos.start.col .. 'l'
+  end
+
+  keys = keys .. 'v' .. pos.stop.row + 1 .. 'G0'
+
+  if pos.stop.col > 0 then
+    keys = keys .. pos.stop.col .. 'l'
+  end
+
+  vim.fn.feedkeys(keys, 'n')
+end
 
 local function clear_positions()
   for name in pairs(M.hl) do
@@ -58,8 +74,9 @@ end
 local function set_current_node(node)
   if node == nil then return end
 
+  vim.wo.winbar = 'TSMode ∙ ' .. node:type()
+
   clear_positions()
-  M.current_node = node
   local pos = node_position(node)
   vim.api.nvim_win_set_cursor(0, { pos.start.row + 1, pos.start.col })
 
@@ -106,10 +123,29 @@ local function keybind(t)
     set_current_node(t.from_parent_to_child())
   end
 
+  local function visual_select()
+    select_position(node_position(t.current()))
+  end
+
+  local function append()
+    local pos = node_position(t.current())
+    vim.api.nvim_win_set_cursor(0, { pos.stop.row + 1, pos.stop.col } )
+    vim.cmd.startinsert()
+  end
+
+  local function prepend()
+    local pos = node_position(t.current())
+    vim.api.nvim_win_set_cursor(0, { pos.start.row + 1, pos.start.col } )
+    vim.cmd.startinsert()
+  end
+
   bind('j', next_node)
   bind('k', prev_node)
   bind('h', parent_node)
   bind('l', child_node)
+  bind('v', visual_select)
+  bind('a', append)
+  bind('A', prepend)
 end
 
 local function enter()
@@ -121,6 +157,7 @@ end
 local function exit()
   clear_positions()
   unkeybind()
+  vim.wo.winbar = nil
 end
 
 M.did_init = false
@@ -145,6 +182,8 @@ function M.init(opts, init_by_plugin)
 
   M.did_init = true
 end
+
+M.init()
 
 return M
 
