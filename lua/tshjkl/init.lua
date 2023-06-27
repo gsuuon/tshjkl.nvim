@@ -1,11 +1,8 @@
--- local M = {}
-_G.tshjkl = _G.tshjkl or {}
-local M = _G.tshjkl
+local M = {}
 
 M.ns = vim.api.nvim_create_namespace('boop')
 
--- M.hl = {}
-M.hl = M.hl or {}
+M.hl = {}
 
 local function clear_positions()
   for name in pairs(M.hl) do
@@ -124,10 +121,14 @@ local function exit()
   unkeybind()
 end
 
+M.did_init = false
 
-local function init()
+function M.init(opts, init_by_plugin)
+  if M.did_init and init_by_plugin then return end
+
+  opts = opts or {}
+
   local on = false
-
   local function toggle()
     if on then
       exit()
@@ -138,10 +139,10 @@ local function init()
     on = not on
   end
 
-  vim.keymap.set('n', '<M-t>', toggle)
-end
+  vim.keymap.set('n', opts.toggle_key or '<M-t>', toggle)
 
-init()
+  M.did_init = true
+end
 
 return M
 
