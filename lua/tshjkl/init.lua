@@ -2,7 +2,7 @@ local trail = require('tshjkl.trail')
 
 local M = {}
 
-M.ns = vim.api.nvim_create_namespace('boop')
+M.ns = vim.api.nvim_create_namespace('tshjkl')
 
 M.hl = {}
 
@@ -130,7 +130,15 @@ local function keybind(t)
   local function append()
     local pos = node_position(t.current())
     vim.api.nvim_win_set_cursor(0, { pos.stop.row + 1, pos.stop.col } )
-    vim.cmd.startinsert()
+
+    local len = #vim.api.nvim_get_current_line()
+
+    -- Insert at the end if we're at the end of the col
+    if len == pos.stop.col then
+      vim.fn.feedkeys('a', 'n')
+    else
+      vim.cmd.startinsert()
+    end
   end
 
   local function prepend()
