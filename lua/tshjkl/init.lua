@@ -1,3 +1,5 @@
+local trail = rerequire('tshjkl.trail')
+
 local M = {}
 
 M.ns = vim.api.nvim_create_namespace('boop')
@@ -68,22 +70,6 @@ local function set_current_node(node)
   show_node(node:child(0), 'Error', 'child')
 end
 
-local function next_node()
-  set_current_node(M.current_node:next_sibling())
-end
-
-local function prev_node()
-  set_current_node(M.current_node:prev_sibling())
-end
-
-local function parent_node()
-  set_current_node(M.current_node:parent())
-end
-
-local function child_node()
-  set_current_node(M.current_node:child(0))
-end
-
 M.keys = {}
 
 local function unkeybind()
@@ -92,7 +78,7 @@ local function unkeybind()
   end
 end
 
-local function keybind()
+local function keybind(t)
   M.keys = {}
 
   local function bind(key, fn)
@@ -104,6 +90,22 @@ local function keybind()
     })
   end
 
+  local function next_node()
+    set_current_node(t.from_sib_to_sib(true))
+  end
+
+  local function prev_node()
+    set_current_node(t.from_sib_to_sib(false))
+  end
+
+  local function parent_node()
+    set_current_node(t.from_child_to_parent())
+  end
+
+  local function child_node()
+    set_current_node(t.from_parent_to_child())
+  end
+
   bind('j', next_node)
   bind('k', prev_node)
   bind('h', parent_node)
@@ -111,9 +113,9 @@ local function keybind()
 end
 
 local function enter()
-  M.entry_node = vim.treesitter.get_node()
-  set_current_node(M.entry_node)
-  keybind()
+  local t = trail.start()
+  set_current_node(t.current())
+  keybind(t)
 end
 
 local function exit()
