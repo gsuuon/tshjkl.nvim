@@ -57,9 +57,12 @@ local unnamed_sib_ops = {
 }
 
 local named = false
-function M.set_named() named = true end
-function M.set_all() named = false end
+---@param named_ boolean
+function M.set_named_mode(named_) named = named_ end
+function M.is_named_mode() return named end
 
+---@param node TSNode
+---@param op_ Op
 function M.sibling(node, op_)
   if named then
     return named_sib_ops[op_](node)

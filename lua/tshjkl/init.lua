@@ -1,4 +1,5 @@
 local trail = require('tshjkl.trail')
+local nav = require('tshjkl.nav')
 
 local M = {}
 
@@ -117,11 +118,11 @@ local function keybind(t)
   end
 
   local function next()
-    set_current_node(t.from_sib_to_sib(trail.nav.next))
+    set_current_node(t.from_sib_to_sib(nav.op.next))
   end
 
   local function prev()
-    set_current_node(t.from_sib_to_sib(trail.nav.prev))
+    set_current_node(t.from_sib_to_sib(nav.op.prev))
   end
 
   local function parent()
@@ -171,11 +172,15 @@ local function keybind(t)
   end
 
   local function first_sibling()
-    set_current_node(t.from_sib_to_sib(trail.nav.first))
+    set_current_node(t.from_sib_to_sib(nav.op.first))
   end
 
   local function last_sibling()
-    set_current_node(t.from_sib_to_sib(trail.nav.last))
+    set_current_node(t.from_sib_to_sib(nav.op.last))
+  end
+
+  local function toggle_named()
+    nav.set_named_mode(not nav.is_named_mode())
   end
 
   bind('j', next)
@@ -189,6 +194,7 @@ local function keybind(t)
   bind('i', prepend)
   bind('<S-j>', last_sibling)
   bind('<S-k>', first_sibling)
+  bind('<M-S-n>', toggle_named)
 end
 
 local function enter(outermost)
@@ -216,7 +222,6 @@ local function keybind_global(opts)
 
   vim.keymap.set('n', opts.toggle_key or '<M-t>', toggle(false))
   vim.keymap.set('n', opts.toggle_key_outer or '<M-T>', toggle(true))
-
 end
 
 function M.init(opts, init_by_plugin)

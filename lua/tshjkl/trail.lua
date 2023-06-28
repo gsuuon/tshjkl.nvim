@@ -87,6 +87,4 @@ function M.start()
   }
 end
 
-M.nav = nav.op
-
 return M
