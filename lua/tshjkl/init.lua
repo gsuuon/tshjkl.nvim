@@ -91,8 +91,17 @@ M.keys = {}
 
 local function unkeybind()
   for _, lhs in ipairs(M.keys) do
-    vim.keymap.del('n', lhs, {buffer = true})
+    pcall(vim.keymap.del, 'n', lhs, {buffer = true})
   end
+end
+
+M.on = false
+
+local function exit()
+  clear_positions()
+  unkeybind()
+  vim.wo.winbar = nil
+  M.on = false
 end
 
 local function keybind(t)
@@ -139,12 +148,15 @@ local function keybind(t)
     else
       vim.cmd.startinsert()
     end
+
+    exit()
   end
 
   local function prepend()
     local pos = node_position(t.current())
     vim.api.nvim_win_set_cursor(0, { pos.start.row + 1, pos.start.col } )
     vim.cmd.startinsert()
+    exit()
   end
 
   bind('j', next_node)
@@ -153,19 +165,14 @@ local function keybind(t)
   bind('l', child_node)
   bind('v', visual_select)
   bind('a', append)
-  bind('A', prepend)
+  bind('i', prepend)
 end
 
 local function enter()
   local t = trail.start()
   set_current_node(t.current())
   keybind(t)
-end
-
-local function exit()
-  clear_positions()
-  unkeybind()
-  vim.wo.winbar = nil
+  M.on = true
 end
 
 M.did_init = false
@@ -175,23 +182,18 @@ function M.init(opts, init_by_plugin)
 
   opts = opts or {}
 
-  local on = false
   local function toggle()
-    if on then
+    if M.on then
       exit()
     else
       enter()
     end
-
-    on = not on
   end
 
   vim.keymap.set('n', opts.toggle_key or '<M-t>', toggle)
 
   M.did_init = true
 end
-
-M.init()
 
 return M
 
