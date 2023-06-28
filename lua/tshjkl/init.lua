@@ -68,6 +68,7 @@ local function show_position(pos, name)
       {
         end_row = pos.stop.row,
         end_col = pos.stop.col,
+        strict = false
       },
       M.opts.marks[name]
     )
