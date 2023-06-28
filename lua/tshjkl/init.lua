@@ -70,7 +70,7 @@ local function show_position(pos, name)
         end_col = pos.stop.col,
         strict = false
       },
-      M.opts.marks[name]
+      M.opts.marks[name] or {}
     )
   )
 end
@@ -336,6 +336,4 @@ function M.init(opts, init_by_plugin)
   M.did_init = true
 end
 
-
 return M
-
