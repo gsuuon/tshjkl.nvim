@@ -72,20 +72,34 @@ local function show_node(node, hl, name)
   )
 end
 
+M.current_node = nil
+
+local function update_winbar()
+  local pre =
+    nav.is_named_mode()
+    and 'TSMode (named)'
+    or 'TSMode'
+
+  local post = M.current_node and M.current_node:type() or ''
+
+  vim.wo.winbar = pre .. ' ∙ ' .. post
+end
+
 local function set_current_node(node)
   if node == nil then return end
+  M.current_node = node
 
-  vim.wo.winbar = 'TSMode ∙ ' .. node:type()
+  update_winbar()
 
   clear_positions()
   local pos = node_position(node)
   vim.api.nvim_win_set_cursor(0, { pos.start.row + 1, pos.start.col })
 
-  show_node(node:parent(), 'Comment', 'parent')
-  show_node(node:next_sibling(), 'WarningFloat', 'next')
-  show_node(node:prev_sibling(), 'InfoFloat', 'prev')
+  show_node(nav.parent(node), 'Comment', 'parent')
+  show_node(nav.sibling(node, nav.op.next), 'WarningFloat', 'next')
+  show_node(nav.sibling(node, nav.op.prev), 'InfoFloat', 'prev')
   show_node(node, 'Substitute', 'current')
-  show_node(node:child(0), 'Error', 'child')
+  show_node(nav.child(node), 'Error', 'child')
 end
 
 M.keys = {}
@@ -181,6 +195,7 @@ local function keybind(t)
 
   local function toggle_named()
     nav.set_named_mode(not nav.is_named_mode())
+    update_winbar()
   end
 
   bind('j', next)
