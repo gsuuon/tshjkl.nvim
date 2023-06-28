@@ -74,22 +74,37 @@ end
 
 M.current_node = nil
 
-local function update_winbar()
-  local pre =
-    nav.is_named_mode()
-    and 'TSMode (named)'
-    or 'TSMode'
 
-  local post = M.current_node and M.current_node:type() or ''
+local winbar = (function()
+  local original
+  local function pre()
+    return nav.is_named_mode()
+      and 'TSMode (named)'
+      or 'TSMode'
+  end
 
-  vim.wo.winbar = pre .. ' ∙ ' .. post
-end
+  return {
+    update = function()
+      if original == nil then
+        original = vim.wo.winbar
+      end
+
+      vim.wo.winbar =
+        pre() .. ' ∙ '
+        .. (M.current_node and M.current_node:type() or '')
+    end,
+    close = function()
+      vim.wo.winbar = original
+      original = nil
+    end,
+  }
+end)()
 
 local function set_current_node(node)
   if node == nil then return end
   M.current_node = node
 
-  update_winbar()
+  winbar.update()
 
   clear_positions()
   local pos = node_position(node)
@@ -115,7 +130,7 @@ M.on = false
 local function exit()
   clear_positions()
   unkeybind()
-  vim.wo.winbar = nil
+  winbar.close()
   M.on = false
 end
 
@@ -195,7 +210,7 @@ local function keybind(t)
 
   local function toggle_named()
     nav.set_named_mode(not nav.is_named_mode())
-    update_winbar()
+    winbar.update()
   end
 
   bind('j', next)
