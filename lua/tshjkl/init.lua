@@ -101,8 +101,8 @@ local winbar = (function()
   local original
   local function pre()
     return nav.is_named_mode()
-      and 'TSMode (named)'
-      or 'TSMode'
+      and 'TSMode'
+      or 'TSMode (all)'
   end
 
   return {
@@ -180,12 +180,38 @@ local function keybind(t)
     set_current_node(t.from_child_to_parent())
   end
 
+  local function pos_is_end_of_line(pos)
+    local line = vim.api.nvim_buf_get_lines(0, pos.row, pos.row + 1, false)
+    return pos.col == #line
+  end
+
   local function child()
     set_current_node(t.from_parent_to_child())
   end
 
   local function visual_select()
     select_position(node_position(t.current()))
+    exit()
+  end
+
+  local function visual_select_back()
+    local pos = node_position(t.current())
+
+    local start
+    if pos_is_end_of_line(pos.stop) then
+      start = pos.stop
+    else
+      start = {
+        row = pos.stop.row,
+        col = pos.stop.col - 1
+      }
+    end
+
+    select_position({
+      start = start,
+      stop = pos.start
+    })
+    exit()
   end
 
   local function append()
@@ -195,10 +221,8 @@ local function keybind(t)
       { pos.stop.row + 1, pos.stop.col }
     )
 
-    local len = #vim.api.nvim_get_current_line()
-
-    -- Insert at the end if we're at the end of the col
-    if len == pos.stop.col then
+    if pos_is_end_of_line(pos.stop) then
+      -- Insert at the end if we're at the end of the col
       vim.fn.feedkeys('a', 'n')
     else
       vim.cmd.startinsert()
@@ -211,6 +235,20 @@ local function keybind(t)
     local pos = node_position(t.current())
     vim.api.nvim_win_set_cursor(0, { pos.start.row + 1, pos.start.col } )
     vim.cmd.startinsert()
+    exit()
+  end
+
+  local function open_above()
+    local pos = node_position(t.current())
+    vim.api.nvim_win_set_cursor(0, { pos.start.row + 1, 0 } )
+    vim.fn.feedkeys('O', 'n')
+    exit()
+  end
+
+  local function open_below()
+    local pos = node_position(t.current())
+    vim.api.nvim_win_set_cursor(0, { pos.stop.row + 1, 0 } )
+    vim.fn.feedkeys('o', 'n')
     exit()
   end
 
@@ -241,9 +279,12 @@ local function keybind(t)
   bind('l', child)
   bind('H', outermost)
   bind('L', innermost)
+  bind('b', visual_select_back)
   bind('v', visual_select)
   bind('a', append)
   bind('i', prepend)
+  bind('o', open_below)
+  bind('<S-o>', open_above)
   bind('<S-j>', last_sibling)
   bind('<S-k>', first_sibling)
   bind(M.opts.keymaps.toggle_named, toggle_named)
@@ -290,7 +331,6 @@ function M.init(opts, init_by_plugin)
   M.did_init = true
 end
 
-M.init()
 
 return M
 
