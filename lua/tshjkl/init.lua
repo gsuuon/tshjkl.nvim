@@ -193,11 +193,7 @@ end
 
 M.did_init = false
 
-function M.init(opts, init_by_plugin)
-  if M.did_init and init_by_plugin then return end
-
-  opts = opts or {}
-
+local function keybind_global(opts)
   local function toggle(outermost)
     return function()
       if M.on then
@@ -210,6 +206,15 @@ function M.init(opts, init_by_plugin)
 
   vim.keymap.set('n', opts.toggle_key or '<M-t>', toggle(false))
   vim.keymap.set('n', opts.toggle_key_outer or '<M-T>', toggle(true))
+
+end
+
+function M.init(opts, init_by_plugin)
+  if M.did_init and init_by_plugin then return end
+
+  opts = opts or {}
+
+  keybind_global(opts)
 
   M.did_init = true
 end
