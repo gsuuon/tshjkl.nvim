@@ -56,7 +56,7 @@ local unnamed_sib_ops = {
   end
 }
 
-local named = false
+local named = true
 ---@param named_ boolean
 function M.set_named_mode(named_) named = named_ end
 function M.is_named_mode() return named end
