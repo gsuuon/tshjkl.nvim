@@ -116,19 +116,19 @@ local function keybind(t)
     })
   end
 
-  local function next_node()
+  local function next()
     set_current_node(t.from_sib_to_sib(true))
   end
 
-  local function prev_node()
+  local function prev()
     set_current_node(t.from_sib_to_sib(false))
   end
 
-  local function parent_node()
+  local function parent()
     set_current_node(t.from_child_to_parent())
   end
 
-  local function child_node()
+  local function child()
     set_current_node(t.from_parent_to_child())
   end
 
@@ -170,15 +170,25 @@ local function keybind(t)
     set_current_node(t.move_outermost())
   end
 
-  bind('j', next_node)
-  bind('k', prev_node)
-  bind('h', parent_node)
-  bind('l', child_node)
+  local function first_sibling()
+    set_current_node(t.from_sib_to_sib(false, true))
+  end
+
+  local function last_sibling()
+    set_current_node(t.from_sib_to_sib(true, true))
+  end
+
+  bind('j', next)
+  bind('k', prev)
+  bind('h', parent)
+  bind('l', child)
   bind('H', outermost)
   bind('L', innermost)
   bind('v', visual_select)
   bind('a', append)
   bind('i', prepend)
+  bind('<S-j>', last_sibling)
+  bind('<S-k>', first_sibling)
 end
 
 local function enter(outermost)

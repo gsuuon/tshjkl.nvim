@@ -43,13 +43,29 @@ function M.start()
     return current.node
   end
 
-  local function from_sib_to_sib(next)
-    local sibling
-    if next then
-      sibling = current.node:next_sibling()
+  ---@param tsnode TSNode
+  ---@param next boolean
+  ---@param to_end boolean
+  local function get_sibling(tsnode, next, to_end)
+    if to_end then
+      local parent = tsnode:parent()
+      if parent == nil then return end
+      if next then
+        return parent:child(parent:child_count() - 1)
+      else
+        return parent:child(0)
+      end
     else
-      sibling = current.node:prev_sibling()
+      if next then
+        return tsnode:next_sibling()
+      else
+        return tsnode:prev_sibling()
+      end
     end
+  end
+
+  local function from_sib_to_sib(next, to_end)
+    local sibling = get_sibling(current.node, next, to_end)
     if sibling == nil then return end
 
     current = {
