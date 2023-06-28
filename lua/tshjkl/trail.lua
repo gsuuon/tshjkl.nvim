@@ -59,11 +59,33 @@ function M.start()
     return current.node
   end
 
+  local function move_outermost()
+    local parent = current.node:parent()
+
+    while parent ~= nil do
+      from_child_to_parent()
+      parent = current.node:parent()
+    end
+
+    -- Real outermost node is the whole file so go in one child
+    return from_parent_to_child()
+  end
+
+  local function move_innermost()
+    while current.child ~= nil do
+      current = current.child
+    end
+
+    return current.node
+  end
+
   return {
     from_child_to_parent = from_child_to_parent,
     from_parent_to_child = from_parent_to_child,
     from_sib_to_sib = from_sib_to_sib,
-    current = function() return current.node end
+    current = function() return current.node end,
+    move_innermost = move_innermost,
+    move_outermost = move_outermost
   }
 end
 

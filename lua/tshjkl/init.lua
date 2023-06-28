@@ -138,7 +138,10 @@ local function keybind(t)
 
   local function append()
     local pos = node_position(t.current())
-    vim.api.nvim_win_set_cursor(0, { pos.stop.row + 1, pos.stop.col } )
+    vim.api.nvim_win_set_cursor(
+      0,
+      { pos.stop.row + 1, pos.stop.col }
+    )
 
     local len = #vim.api.nvim_get_current_line()
 
@@ -159,17 +162,30 @@ local function keybind(t)
     exit()
   end
 
+  local function innermost()
+    set_current_node(t.move_innermost())
+  end
+
+  local function outermost()
+    set_current_node(t.move_outermost())
+  end
+
   bind('j', next_node)
   bind('k', prev_node)
   bind('h', parent_node)
   bind('l', child_node)
+  bind('H', outermost)
+  bind('L', innermost)
   bind('v', visual_select)
   bind('a', append)
   bind('i', prepend)
 end
 
-local function enter()
+local function enter(outermost)
   local t = trail.start()
+
+  if outermost then t.move_outermost() end
+
   set_current_node(t.current())
   keybind(t)
   M.on = true
@@ -182,15 +198,18 @@ function M.init(opts, init_by_plugin)
 
   opts = opts or {}
 
-  local function toggle()
-    if M.on then
-      exit()
-    else
-      enter()
+  local function toggle(outermost)
+    return function()
+      if M.on then
+        exit()
+      else
+        enter(outermost)
+      end
     end
   end
 
-  vim.keymap.set('n', opts.toggle_key or '<M-t>', toggle)
+  vim.keymap.set('n', opts.toggle_key or '<M-t>', toggle(false))
+  vim.keymap.set('n', opts.toggle_key_outer or '<M-T>', toggle(true))
 
   M.did_init = true
 end
