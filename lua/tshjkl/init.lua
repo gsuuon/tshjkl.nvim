@@ -117,11 +117,11 @@ local function keybind(t)
   end
 
   local function next()
-    set_current_node(t.from_sib_to_sib(true))
+    set_current_node(t.from_sib_to_sib(trail.nav.next))
   end
 
   local function prev()
-    set_current_node(t.from_sib_to_sib(false))
+    set_current_node(t.from_sib_to_sib(trail.nav.prev))
   end
 
   local function parent()
@@ -171,11 +171,11 @@ local function keybind(t)
   end
 
   local function first_sibling()
-    set_current_node(t.from_sib_to_sib(false, true))
+    set_current_node(t.from_sib_to_sib(trail.nav.first))
   end
 
   local function last_sibling()
-    set_current_node(t.from_sib_to_sib(true, true))
+    set_current_node(t.from_sib_to_sib(trail.nav.last))
   end
 
   bind('j', next)

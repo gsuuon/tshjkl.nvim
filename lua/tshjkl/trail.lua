@@ -1,3 +1,5 @@
+local nav = require('tshjkl.nav')
+
 local M = {}
 
 ---@class Node
@@ -13,7 +15,7 @@ function M.start()
   local current = { node = node }
 
   local function from_child_to_parent()
-    local parent = current.node:parent()
+    local parent = nav.parent(current.node)
     if parent == nil then return end
 
     if current.parent == nil or current.parent.node ~= node then
@@ -29,7 +31,7 @@ function M.start()
 
   local function from_parent_to_child()
     if current.child == nil then
-      local child = current.node:child(0)
+      local child = nav.child(current.node)
 
       if child == nil then return end
 
@@ -43,29 +45,9 @@ function M.start()
     return current.node
   end
 
-  ---@param tsnode TSNode
-  ---@param next boolean
-  ---@param to_end boolean
-  local function get_sibling(tsnode, next, to_end)
-    if to_end then
-      local parent = tsnode:parent()
-      if parent == nil then return end
-      if next then
-        return parent:child(parent:child_count() - 1)
-      else
-        return parent:child(0)
-      end
-    else
-      if next then
-        return tsnode:next_sibling()
-      else
-        return tsnode:prev_sibling()
-      end
-    end
-  end
-
-  local function from_sib_to_sib(next, to_end)
-    local sibling = get_sibling(current.node, next, to_end)
+  ---@param op Op
+  local function from_sib_to_sib(op)
+    local sibling = nav.sibling(current.node, op)
     if sibling == nil then return end
 
     current = {
@@ -76,11 +58,11 @@ function M.start()
   end
 
   local function move_outermost()
-    local parent = current.node:parent()
+    local parent = nav.parent(current.node)
 
     while parent ~= nil do
       from_child_to_parent()
-      parent = current.node:parent()
+      parent = nav.parent(current.node)
     end
 
     -- Real outermost node is the whole file so go in one child
@@ -104,5 +86,7 @@ function M.start()
     move_outermost = move_outermost
   }
 end
+
+M.nav = nav.op
 
 return M
