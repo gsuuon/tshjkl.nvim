@@ -5,7 +5,7 @@ local M = {}
 
 M.ns = vim.api.nvim_create_namespace('tshjkl')
 
-M.hl = {}
+M.marks = {}
 
 local function select_position(pos)
   local keys = pos.start.row + 1 .. 'G0'
@@ -24,26 +24,28 @@ local function select_position(pos)
 end
 
 local function clear_positions()
-  for name in pairs(M.hl) do
-    vim.api.nvim_buf_del_extmark(0, M.ns, M.hl[name])
+  for name in pairs(M.marks) do
+    vim.api.nvim_buf_del_extmark(0, M.ns, M.marks[name])
   end
 end
 
-local function show_position(pos, hl, name)
-  if M.hl[name] ~= nil then
-    vim.api.nvim_buf_del_extmark(0, M.ns, M.hl[name])
+local function show_position(pos, name)
+  if M.marks[name] ~= nil then
+    vim.api.nvim_buf_del_extmark(0, M.ns, M.marks[name])
   end
 
-  M.hl[name] = vim.api.nvim_buf_set_extmark(
+  M.marks[name] = vim.api.nvim_buf_set_extmark(
     0,
     M.ns,
     pos.start.row,
     pos.start.col,
-    {
-      end_row = pos.stop.row,
-      end_col = pos.stop.col,
-      hl_group = hl
-    }
+    vim.tbl_extend('force',
+      {
+        end_row = pos.stop.row,
+        end_col = pos.stop.col,
+      },
+      M.opts.marks[name]
+    )
   )
 end
 
@@ -62,18 +64,13 @@ local function node_position(node)
   }
 end
 
-local function show_node(node, hl, name)
+local function show_node(node, name)
   if node == nil then return end
 
-  show_position(
-    node_position(node),
-    hl or 'SpecialComment',
-    name or 'current'
-  )
+  show_position(node_position(node), name)
 end
 
 M.current_node = nil
-
 
 local winbar = (function()
   local original
@@ -110,11 +107,11 @@ local function set_current_node(node)
   local pos = node_position(node)
   vim.api.nvim_win_set_cursor(0, { pos.start.row + 1, pos.start.col })
 
-  show_node(nav.parent(node), 'Comment', 'parent')
-  show_node(nav.sibling(node, nav.op.next), 'WarningFloat', 'next')
-  show_node(nav.sibling(node, nav.op.prev), 'InfoFloat', 'prev')
-  show_node(node, 'Substitute', 'current')
-  show_node(nav.child(node), 'Error', 'child')
+  show_node(nav.parent(node), 'parent')
+  show_node(nav.sibling(node, nav.op.next), 'next')
+  show_node(nav.sibling(node, nav.op.prev), 'prev')
+  show_node(node, 'current')
+  show_node(nav.child(node), 'child')
 end
 
 M.keys = {}
@@ -250,19 +247,41 @@ local function keybind_global(opts)
     end
   end
 
-  vim.keymap.set('n', opts.toggle_key or '<M-t>', toggle(false))
-  vim.keymap.set('n', opts.toggle_key_outer or '<M-T>', toggle(true))
+  vim.keymap.set('n', opts.toggle_key, toggle(false))
+  vim.keymap.set('n', opts.toggle_key_outer, toggle(true))
 end
 
 function M.init(opts, init_by_plugin)
   if M.did_init and init_by_plugin then return end
 
-  opts = opts or {}
+  M.opts = vim.tbl_deep_extend('force', {
+    toggle_key = '<M-t>',
+    toggle_key_outer = '<M-T>',
+    marks = {
+      parent = {
+        hl_group = 'Comment'
+      },
+      child = {
+        hl_group = 'Error'
+      },
+      next = {
+        hl_group = 'WarningFloat'
+      },
+      prev = {
+        hl_group = 'InfoFloat'
+      },
+      current = {
+        hl_group = 'Substitute'
+      },
+    }
+  }, opts or {})
 
-  keybind_global(opts)
+  keybind_global(M.opts)
 
   M.did_init = true
 end
+
+M.init()
 
 return M
 
