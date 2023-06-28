@@ -3,6 +3,31 @@ local nav = require('tshjkl.nav')
 
 local M = {}
 
+local default_config = {
+  keymaps = {
+    toggle= '<M-t>',
+    toggle_outer = '<M-T>',
+    toggle_named = '<S-M-n>',
+  },
+  marks = {
+    parent = {
+      hl_group = 'Comment'
+    },
+    child = {
+      hl_group = 'Error'
+    },
+    next = {
+      hl_group = 'WarningFloat'
+    },
+    prev = {
+      hl_group = 'InfoFloat'
+    },
+    current = {
+      hl_group = 'Substitute'
+    },
+  }
+}
+
 M.ns = vim.api.nvim_create_namespace('tshjkl')
 
 M.marks = {}
@@ -221,7 +246,7 @@ local function keybind(t)
   bind('i', prepend)
   bind('<S-j>', last_sibling)
   bind('<S-k>', first_sibling)
-  bind('<M-S-n>', toggle_named)
+  bind(M.opts.keymaps.toggle_named, toggle_named)
 end
 
 local function enter(outermost)
@@ -247,34 +272,18 @@ local function keybind_global(opts)
     end
   end
 
-  vim.keymap.set('n', opts.toggle_key, toggle(false))
-  vim.keymap.set('n', opts.toggle_key_outer, toggle(true))
+  vim.keymap.set('n', opts.keymaps.toggle, toggle(false))
+  vim.keymap.set('n', opts.keymaps.toggle_outer, toggle(true))
 end
 
 function M.init(opts, init_by_plugin)
   if M.did_init and init_by_plugin then return end
 
-  M.opts = vim.tbl_deep_extend('force', {
-    toggle_key = '<M-t>',
-    toggle_key_outer = '<M-T>',
-    marks = {
-      parent = {
-        hl_group = 'Comment'
-      },
-      child = {
-        hl_group = 'Error'
-      },
-      next = {
-        hl_group = 'WarningFloat'
-      },
-      prev = {
-        hl_group = 'InfoFloat'
-      },
-      current = {
-        hl_group = 'Substitute'
-      },
-    }
-  }, opts or {})
+  M.opts = vim.tbl_deep_extend(
+    'force',
+    default_config,
+    opts or {}
+  )
 
   keybind_global(M.opts)
 
