@@ -42,7 +42,7 @@ local function select_position(pos)
   keys = keys .. 'v' .. pos.stop.row + 1 .. 'G0'
 
   if pos.stop.col > 0 then
-    keys = keys .. pos.stop.col .. 'l'
+    keys = keys .. pos.stop.col - 1 .. 'l'
   end
 
   vim.fn.feedkeys(keys, 'n')
@@ -210,8 +210,12 @@ local function keybind(t)
 
     select_position({
       start = start,
-      stop = pos.start
+      stop = {
+        row = pos.start.row,
+        col = pos.start.col + 1,
+      }
     })
+
     exit()
   end
 
