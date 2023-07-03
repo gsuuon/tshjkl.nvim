@@ -9,6 +9,10 @@ local default_config = {
     toggle= '<M-t>',
     toggle_outer = '<M-T>',
     toggle_named = '<S-M-n>',
+    parent = 'k',
+    next = 'l',
+    prev = 'h',
+    child = 'j'
   },
   marks = {
     parent = {
@@ -180,8 +184,10 @@ end
 M.keys = {}
 
 local function unkeybind()
+  local mode = M.opts.visual_mode and 'v' or 'n'
+
   for _, lhs in ipairs(M.keys) do
-    pcall(vim.keymap.del, 'n', lhs, {buffer = true})
+    pcall(vim.keymap.del, mode, lhs, {buffer = true})
   end
 end
 
@@ -319,10 +325,10 @@ local function keybind(t)
     winbar.update()
   end
 
-  bind('j', next)
-  bind('k', prev)
-  bind('h', parent)
-  bind('l', child)
+  bind(M.opts.keymaps.next, next)
+  bind(M.opts.keymaps.prev, prev)
+  bind(M.opts.keymaps.parent, parent)
+  bind(M.opts.keymaps.child, child)
   bind('H', outermost)
   bind('L', innermost)
   bind('b', visual_select_back)
