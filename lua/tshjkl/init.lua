@@ -4,6 +4,7 @@ local nav = require('tshjkl.nav')
 local M = {}
 
 local default_config = {
+  visual_mode = true,
   keymaps = {
     toggle= '<M-t>',
     toggle_outer = '<M-T>',
@@ -32,6 +33,26 @@ M.ns = vim.api.nvim_create_namespace('tshjkl')
 
 M.marks = {}
 
+local visual_mode_leave = (function()
+  -- The ModeChange event fires after feedkeys of select_position
+  -- select_position includes an <esc> to move to normal mode before
+  -- visual again, so we need to ignore this first visual to normal change
+  local should_ignore_next = false
+
+  return {
+    ignore_next = function()
+      should_ignore_next = true
+    end,
+    handle_exit_visual = function()
+      if should_ignore_next then
+        should_ignore_next = false
+      elseif M.on then
+        M.exit()
+      end
+    end
+  }
+end)()
+
 local function select_position(pos)
   local keys = pos.start.row + 1 .. 'G0'
 
@@ -45,7 +66,18 @@ local function select_position(pos)
     keys = keys .. pos.stop.col - 1 .. 'l'
   end
 
-  vim.fn.feedkeys(keys, 'n')
+  vim.api.nvim_feedkeys(
+    vim.api.nvim_replace_termcodes(
+      "<Esc>" .. keys,
+      true, false, true
+    ),
+    'n',
+    true
+  )
+
+  if vim.api.nvim_get_mode().mode == 'v' then
+    visual_mode_leave.ignore_next()
+  end
 end
 
 local function clear_positions()
@@ -136,8 +168,13 @@ local function set_current_node(node)
   show_node(nav.parent(node), 'parent')
   show_node(nav.sibling(node, nav.op.next), 'next')
   show_node(nav.sibling(node, nav.op.prev), 'prev')
-  show_node(node, 'current')
-  show_node(nav.child(node), 'child')
+
+  if M.opts.visual_mode then
+    select_position(pos)
+  else
+    show_node(node, 'current')
+    show_node(nav.child(node), 'child')
+  end
 end
 
 M.keys = {}
@@ -157,6 +194,8 @@ local function exit()
   M.on = false
 end
 
+M.exit = exit
+
 local function keybind(t)
   M.keys = {}
 
@@ -164,7 +203,9 @@ local function keybind(t)
     local lhs = key
     table.insert(M.keys, lhs)
 
-    vim.keymap.set('n', lhs, fn, {
+    local mode = M.opts.visual_mode and 'v' or 'n'
+
+    vim.keymap.set(mode, lhs, fn, {
       buffer = true
     })
   end
@@ -320,6 +361,13 @@ local function keybind_global(opts)
 
   vim.keymap.set('n', opts.keymaps.toggle, toggle(false))
   vim.keymap.set('n', opts.keymaps.toggle_outer, toggle(true))
+
+  if M.opts.visual_mode then
+    vim.api.nvim_create_autocmd('ModeChanged', {
+      pattern = 'v:*',
+      callback = visual_mode_leave.handle_exit_visual
+    })
+  end
 end
 
 function M.init(opts, init_by_plugin)
