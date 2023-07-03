@@ -9,10 +9,10 @@ local default_config = {
     toggle= '<M-t>',
     toggle_outer = '<M-T>',
     toggle_named = '<S-M-n>',
-    parent = 'k',
-    next = 'l',
-    prev = 'h',
-    child = 'j'
+    parent = 'h',
+    next = 'j',
+    prev = 'k',
+    child = 'l'
   },
   marks = {
     parent = {
