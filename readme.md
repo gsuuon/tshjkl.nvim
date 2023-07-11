@@ -1,11 +1,11 @@
 # tshjkl.nvim 🌳
 
-Toggleable tree-sitter mode
+Tree-sitter `hjkl` mode
 
 ![tshjkl](https://github.com/gsuuon/tshjkl.nvim/assets/6422188/608c95c1-0f83-4abc-89e5-cc114e877afb)
 
 ## Usage
-Use the toggle key to switch to ts mode, then `hjkl` to scope in/out or move to the next/previous sibling. The default toggle key is `<M-t>`. Movement keys and extmark highlights can be configured, check [init.lua](lua/tshjkl/init.lua) to see configuration and defaults. 
+Use the toggle key to switch to ts mode, then `hjkl` to scope in/out or move to the next/previous sibling. The toggle map is `<M-v>` (`Alt-v`) and nodes are selected by default. Toggle, movement keys, extmark highlights and select mode can be configured - check [init.lua](lua/tshjkl/init.lua) to see configuration and defaults. 
 
 ### Demo
 https://github.com/gsuuon/tshjkl.nvim/assets/6422188/58944f74-efab-4db8-bf51-d659f35c5759
