@@ -6,8 +6,8 @@ local M = {}
 local default_config = {
   select_current_node = true, -- false to highlight only
   keymaps = {
-    toggle = '<M-t>',
-    toggle_outer = '<M-T>',
+    toggle = '<M-v>',
+    toggle_outer = '<S-M-v>',
     toggle_named = '<S-M-n>', -- only bound when we're toggled on on
     parent = 'h',
     next = 'j',
@@ -196,6 +196,12 @@ local function exit()
   unkeybind()
   winbar.close()
   M.on = false
+
+  if M.opts.select_current_node then
+    vim.fn.feedkeys(
+      vim.api.nvim_replace_termcodes('<Esc>', true, false, true)
+    )
+  end
 end
 
 M.exit = exit
