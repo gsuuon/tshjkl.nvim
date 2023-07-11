@@ -1,1 +1,1 @@
-require('tshjkl').init(nil, true)
+require('tshjkl')._plugin_setup()

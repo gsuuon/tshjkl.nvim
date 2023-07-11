@@ -352,7 +352,6 @@ local function enter(outermost)
   M.on = true
 end
 
-M.did_init = false
 
 local function keybind_global(opts)
   local function toggle(outermost)
@@ -376,9 +375,15 @@ local function keybind_global(opts)
   end
 end
 
-function M.init(opts, init_by_plugin)
-  if M.did_init and init_by_plugin then return end
+M.did_setup = false
 
+function M._plugin_setup()
+  if M.did_setup then return end
+
+  M.setup()
+end
+
+function M.setup(opts)
   M.opts = vim.tbl_deep_extend(
     'force',
     default_config,
@@ -387,7 +392,7 @@ function M.init(opts, init_by_plugin)
 
   keybind_global(M.opts)
 
-  M.did_init = true
+  M.did_setup = true
 end
 
 return M
