@@ -4,7 +4,7 @@ local nav = require('tshjkl.nav')
 local M = {}
 
 local default_config = {
-  visual_mode = true,
+  select_current_node = true, -- false to highlight only
   keymaps = {
     toggle= '<M-t>',
     toggle_outer = '<M-T>',
@@ -173,7 +173,7 @@ local function set_current_node(node)
   show_node(nav.sibling(node, nav.op.next), 'next')
   show_node(nav.sibling(node, nav.op.prev), 'prev')
 
-  if M.opts.visual_mode then
+  if M.opts.select_current_node then
     select_position(pos)
   else
     show_node(node, 'current')
@@ -184,7 +184,7 @@ end
 M.keys = {}
 
 local function unkeybind()
-  local mode = M.opts.visual_mode and 'v' or 'n'
+  local mode = M.opts.select_current_node and 'v' or 'n'
 
   for _, lhs in ipairs(M.keys) do
     pcall(vim.keymap.del, mode, lhs, {buffer = true})
@@ -209,7 +209,7 @@ local function keybind(t)
     local lhs = key
     table.insert(M.keys, lhs)
 
-    local mode = M.opts.visual_mode and 'v' or 'n'
+    local mode = M.opts.select_current_node and 'v' or 'n'
 
     vim.keymap.set(mode, lhs, fn, {
       buffer = true
@@ -367,7 +367,7 @@ local function keybind_global(opts)
   vim.keymap.set('n', opts.keymaps.toggle, toggle(false))
   vim.keymap.set('n', opts.keymaps.toggle_outer, toggle(true))
 
-  if M.opts.visual_mode then
+  if M.opts.select_current_node then
     vim.api.nvim_create_autocmd('ModeChanged', {
       pattern = 'v:*',
       callback = visual_mode_leave.handle_exit_visual
