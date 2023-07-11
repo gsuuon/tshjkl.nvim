@@ -6,9 +6,9 @@ local M = {}
 local default_config = {
   select_current_node = true, -- false to highlight only
   keymaps = {
-    toggle= '<M-t>',
+    toggle = '<M-t>',
     toggle_outer = '<M-T>',
-    toggle_named = '<S-M-n>',
+    toggle_named = '<S-M-n>', -- only bound when we're toggled on on
     parent = 'h',
     next = 'j',
     prev = 'k',
@@ -85,9 +85,7 @@ local function select_position(pos)
 end
 
 local function clear_positions()
-  for name in pairs(M.marks) do
-    vim.api.nvim_buf_del_extmark(0, M.ns, M.marks[name])
-  end
+  vim.api.nvim_buf_clear_namespace(0, M.ns, 0, -1)
 end
 
 local function show_position(pos, name)
@@ -138,8 +136,8 @@ local winbar = (function()
   local original
   local function pre()
     return nav.is_named_mode()
-      and 'TSMode'
-      or 'TSMode (all)'
+        and 'TSMode'
+        or 'TSMode (all)'
   end
 
   return {
@@ -149,8 +147,8 @@ local winbar = (function()
       end
 
       vim.wo.winbar =
-        pre() .. ' ∙ '
-        .. (M.current_node and M.current_node:type() or '')
+          pre() .. ' ∙ '
+          .. (M.current_node and M.current_node:type() or '')
     end,
     close = function()
       vim.wo.winbar = original
@@ -187,7 +185,7 @@ local function unkeybind()
   local mode = M.opts.select_current_node and 'v' or 'n'
 
   for _, lhs in ipairs(M.keys) do
-    pcall(vim.keymap.del, mode, lhs, {buffer = true})
+    pcall(vim.keymap.del, mode, lhs, { buffer = true })
   end
 end
 
@@ -285,21 +283,21 @@ local function keybind(t)
 
   local function prepend()
     local pos = node_position(t.current())
-    vim.api.nvim_win_set_cursor(0, { pos.start.row + 1, pos.start.col } )
+    vim.api.nvim_win_set_cursor(0, { pos.start.row + 1, pos.start.col })
     vim.cmd.startinsert()
     exit()
   end
 
   local function open_above()
     local pos = node_position(t.current())
-    vim.api.nvim_win_set_cursor(0, { pos.start.row + 1, 0 } )
+    vim.api.nvim_win_set_cursor(0, { pos.start.row + 1, 0 })
     vim.fn.feedkeys('O', 'n')
     exit()
   end
 
   local function open_below()
     local pos = node_position(t.current())
-    vim.api.nvim_win_set_cursor(0, { pos.stop.row + 1, 0 } )
+    vim.api.nvim_win_set_cursor(0, { pos.stop.row + 1, 0 })
     vim.fn.feedkeys('o', 'n')
     exit()
   end
