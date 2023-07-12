@@ -2,17 +2,18 @@
 
 Tree-sitter `hjkl` mode
 
-![tshjkl](https://github.com/gsuuon/tshjkl.nvim/assets/6422188/608c95c1-0f83-4abc-89e5-cc114e877afb)
+![image](https://github.com/gsuuon/tshjkl.nvim/assets/6422188/e1942195-dd08-44e8-9db3-2209a4ea4943)
 
 ## Usage
-Use the toggle key to switch to ts mode, then `hjkl` to scope in/out or move to the next/previous sibling. The toggle map is `<M-v>` (`Alt-v`) and nodes are selected by default. Toggle, movement keys, extmark highlights and select mode can be configured - check [init.lua](lua/tshjkl/init.lua) to see configuration and defaults. 
+Toggle into `tshjkl` mode, then use `hjkl` to change scope or select a sibling node. Toggle is mapped to `<M-v>` (`Alt-v`) and nodes are visually selected by default. Toggle, movement keys, extmark highlights and select mode can be configured - check [init.lua](lua/tshjkl/init.lua) to see configuration and defaults. 
 
 ### Demo
 https://github.com/gsuuon/tshjkl.nvim/assets/6422188/58944f74-efab-4db8-bf51-d659f35c5759
 
 ### Example
 Unwrapping a function  
-- toggle on the inner body
+- toggle with cursor over the inner body
+- change scope if you need to
 - `d`
 - toggle the node to replace
 - `p`  
@@ -42,7 +43,5 @@ Check [binds](https://github.com/gsuuon/tshjkl.nvim/blob/9c608e4a70c69a4ab0e01f2
 `L` — inner-most child  
 
 
----
-### TODO
-- [ ] Can switch between highlight and select mode 
-  - we can select from highlight mode but it would be nice to be able to toggle this
+## Motivation
+This plugin makes it easier to work with tree-sitter nodes - I've found it often surprising which node is under the cursor so I want to make navigating nodes as easy as basic navigation in Neovim. Visual select by default lets you do normal operations without too much extra thought - this just helps you easily select the node you're interested in.

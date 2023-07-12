@@ -8,14 +8,17 @@ local default_config = {
   keymaps = {
     toggle = '<M-v>',
     toggle_outer = '<S-M-v>',
-    toggle_named = '<S-M-n>', -- only bound when we're toggled on on
+
+    -- these are only bound when we're toggled on on
     parent = 'h',
     next = 'j',
     prev = 'k',
-    child = 'l'
+    child = 'l',
+    toggle_named = '<S-M-n>', -- named mode skips unnamed nodes
   },
   marks = {
-    parent = {
+    parent = { -- these are extmark options (:h nvim_buf_set_extmark)
+               -- you could add e.g. virt_text, sign_text
       hl_group = 'Comment'
     },
     child = {
