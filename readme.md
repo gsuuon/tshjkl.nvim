@@ -28,7 +28,7 @@ use 'gsuuon/tshjkl.nvim'
 ```
 
 ### Configure
-Pass an override of the [default config](lua/tshjkl/init.lua) into `require('gsuon/tshjkl.nvim').setup`
+Pass an override of the [default config](lua/tshjkl/init.lua) into `require('gsuuon/tshjkl.nvim').setup`
 
 ## Keymaps
 Check [binds](https://github.com/gsuuon/tshjkl.nvim/blob/9c608e4a70c69a4ab0e01f22a2f507106491c4af/lua/tshjkl/init.lua#L326) for more
