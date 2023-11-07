@@ -23,12 +23,65 @@ https://github.com/gsuuon/tshjkl.nvim/assets/6422188/008843a0-a6be-43c7-999f-d68
 
 ## Install
 
+lazy.nvim:
 ```lua
-use 'gsuuon/tshjkl.nvim'
+{
+  'gsuuon/tshjkl.nvim',
+  config = true
+}
+```
+
+packer.nvim:
+```lua
+use {
+  'gsuuon/tshjkl.nvim',
+  config = require('tshjkl').setup()
+}
 ```
 
 ### Configure
-Pass an override of the [default config](lua/tshjkl/init.lua) into `require('gsuuon/tshjkl.nvim').setup`
+You can override the [default config](lua/tshjkl/init.lua) with lazy `opts`:
+```lua
+{
+  'gsuuon/tshjkl.nvim',
+  opts = {
+    keymaps = {
+      toggle = '<leader>ct',
+    },
+    marks = {
+      parent = {
+        virt_text = { {'h', 'ModeMsg'} },
+        virt_text_pos = 'overlay'
+      },
+      child = {
+        virt_text = { {'l', 'ModeMsg'} },
+        virt_text_pos = 'overlay'
+      },
+      prev = {
+        virt_text = { {'k', 'ModeMsg'} },
+        virt_text_pos = 'overlay'
+      },
+      next = {
+        virt_text = { {'j', 'ModeMsg'} },
+        virt_text_pos = 'overlay'
+      }
+    }
+  }
+}
+```
+
+Or packer in `require('tshjkl').setup({})`:
+
+```lua
+use {
+  'gsuuon/tshjkl.nvim',
+  config = require('tshjkl').setup({
+    keymaps = {
+      toggle = '<leader>N',
+    }
+  })
+}
+```
 
 ## Keymaps
 Check [binds](https://github.com/gsuuon/tshjkl.nvim/blob/9c608e4a70c69a4ab0e01f22a2f507106491c4af/lua/tshjkl/init.lua#L326) for more
