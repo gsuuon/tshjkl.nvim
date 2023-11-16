@@ -371,8 +371,8 @@ local function keybind_global(opts)
     end
   end
 
-  vim.keymap.set('n', opts.keymaps.toggle, toggle(false))
-  vim.keymap.set('n', opts.keymaps.toggle_outer, toggle(true))
+  vim.keymap.set('n', opts.keymaps.toggle, toggle(false), { desc = "tshjkl toggle" })
+  vim.keymap.set('n', opts.keymaps.toggle_outer, toggle(true), { desc = "tshjkl toggle_outer" })
 
   if M.opts.select_current_node then
     vim.api.nvim_create_autocmd('ModeChanged', {
