@@ -35,7 +35,9 @@ packer.nvim:
 ```lua
 use {
   'gsuuon/tshjkl.nvim',
-  config = require('tshjkl').setup()
+  config = function()
+    require('tshjkl').setup()
+  end
 }
 ```
 
@@ -75,11 +77,13 @@ Or packer in `require('tshjkl').setup({})`:
 ```lua
 use {
   'gsuuon/tshjkl.nvim',
-  config = require('tshjkl').setup({
-    keymaps = {
-      toggle = '<leader>N',
-    }
-  })
+  config = function()
+    require('tshjkl').setup({
+      keymaps = {
+        toggle = '<leader>N',
+      }
+    })
+  end
 }
 ```
 
