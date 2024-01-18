@@ -9,19 +9,23 @@ local M = {}
 
 function M.start()
   local node = vim.treesitter.get_node()
-  if node == nil then return end
+  if node == nil then
+    return
+  end
 
   ---@type Node
   local current = { node = node }
 
   local function from_child_to_parent()
     local parent = nav.parent(current.node)
-    if parent == nil then return end
+    if parent == nil then
+      return
+    end
 
     if current.parent == nil or current.parent.node ~= node then
       current.parent = {
         node = parent,
-        child = current
+        child = current,
       }
     end
 
@@ -33,11 +37,13 @@ function M.start()
     if current.child == nil then
       local child = nav.child(current.node)
 
-      if child == nil then return end
+      if child == nil then
+        return
+      end
 
       current.child = {
         node = child,
-        parent = current
+        parent = current,
       }
     end
 
@@ -48,10 +54,12 @@ function M.start()
   ---@param op Op
   local function from_sib_to_sib(op)
     local sibling = nav.sibling(current.node, op)
-    if sibling == nil then return end
+    if sibling == nil then
+      return
+    end
 
     current = {
-      node = sibling
+      node = sibling,
     }
 
     return current.node
@@ -81,9 +89,11 @@ function M.start()
     from_child_to_parent = from_child_to_parent,
     from_parent_to_child = from_parent_to_child,
     from_sib_to_sib = from_sib_to_sib,
-    current = function() return current.node end,
+    current = function()
+      return current.node
+    end,
     move_innermost = move_innermost,
-    move_outermost = move_outermost
+    move_outermost = move_outermost,
   }
 end
 

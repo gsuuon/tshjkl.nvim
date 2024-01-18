@@ -19,22 +19,22 @@ local default_config = {
   },
   marks = {
     parent = { -- these are extmark options (:h nvim_buf_set_extmark)
-               -- you could add e.g. virt_text, sign_text
-      hl_group = 'Comment'
+      -- you could add e.g. virt_text, sign_text
+      hl_group = 'Comment',
     },
     child = {
-      hl_group = 'Error'
+      hl_group = 'Error',
     },
     next = {
-      hl_group = 'WarningFloat'
+      hl_group = 'WarningFloat',
     },
     prev = {
-      hl_group = 'InfoFloat'
+      hl_group = 'InfoFloat',
     },
     current = {
-      hl_group = 'Substitute'
+      hl_group = 'Substitute',
     },
-  }
+  },
 }
 
 M.ns = vim.api.nvim_create_namespace('tshjkl')
@@ -57,7 +57,7 @@ local visual_mode_leave = (function()
       elseif M.on then
         M.exit()
       end
-    end
+    end,
   }
 end)()
 
@@ -75,10 +75,7 @@ local function select_position(pos)
   end
 
   vim.api.nvim_feedkeys(
-    vim.api.nvim_replace_termcodes(
-      "<Esc>" .. keys,
-      true, false, true
-    ),
+    vim.api.nvim_replace_termcodes('<Esc>' .. keys, true, false, true),
     'n',
     true
   )
@@ -102,14 +99,11 @@ local function show_position(pos, name)
     M.ns,
     pos.start.row,
     pos.start.col,
-    vim.tbl_extend('force',
-      {
-        end_row = pos.stop.row,
-        end_col = pos.stop.col,
-        strict = false
-      },
-      M.opts.marks[name] or {}
-    )
+    vim.tbl_extend('force', {
+      end_row = pos.stop.row,
+      end_col = pos.stop.col,
+      strict = false,
+    }, M.opts.marks[name] or {})
   )
 end
 
@@ -123,13 +117,15 @@ local function node_position(node)
     },
     stop = {
       row = stop_row,
-      col = stop_col
-    }
+      col = stop_col,
+    },
   }
 end
 
 local function show_node(node, name)
-  if node == nil then return end
+  if node == nil then
+    return
+  end
 
   show_position(node_position(node), name)
 end
@@ -139,9 +135,7 @@ M.current_node = nil
 local winbar = (function()
   local original
   local function pre()
-    return nav.is_named_mode()
-        and 'TSMode'
-        or 'TSMode (all)'
+    return nav.is_named_mode() and 'TSMode' or 'TSMode (all)'
   end
 
   return {
@@ -150,9 +144,9 @@ local winbar = (function()
         original = vim.wo.winbar
       end
 
-      vim.wo.winbar =
-          pre() .. ' ∙ '
-          .. (M.current_node and M.current_node:type() or '')
+      vim.wo.winbar = pre()
+        .. ' ∙ '
+        .. (M.current_node and M.current_node:type() or '')
     end,
     close = function()
       vim.wo.winbar = original
@@ -162,7 +156,9 @@ local winbar = (function()
 end)()
 
 local function set_current_node(node)
-  if node == nil then return end
+  if node == nil then
+    return
+  end
   M.current_node = node
 
   winbar.update()
@@ -202,9 +198,7 @@ local function exit()
   M.on = false
 
   if M.opts.select_current_node then
-    vim.fn.feedkeys(
-      vim.api.nvim_replace_termcodes('<Esc>', true, false, true)
-    )
+    vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<Esc>', true, false, true))
   end
 end
 
@@ -220,7 +214,7 @@ local function keybind(t)
     local mode = M.opts.select_current_node and 'v' or 'n'
 
     vim.keymap.set(mode, lhs, fn, {
-      buffer = true
+      buffer = true,
     })
   end
 
@@ -259,7 +253,7 @@ local function keybind(t)
     else
       start = {
         row = pos.stop.row,
-        col = pos.stop.col - 1
+        col = pos.stop.col - 1,
       }
     end
 
@@ -268,7 +262,7 @@ local function keybind(t)
       stop = {
         row = pos.start.row,
         col = pos.start.col + 1,
-      }
+      },
     })
 
     exit()
@@ -276,10 +270,7 @@ local function keybind(t)
 
   local function append()
     local pos = node_position(t.current())
-    vim.api.nvim_win_set_cursor(
-      0,
-      { pos.stop.row + 1, pos.stop.col }
-    )
+    vim.api.nvim_win_set_cursor(0, { pos.stop.row + 1, pos.stop.col })
 
     if pos_is_end_of_line(pos.stop) then
       -- Insert at the end if we're at the end of the col
@@ -353,13 +344,14 @@ end
 local function enter(outermost)
   local t = trail.start()
 
-  if outermost then t.move_outermost() end
+  if outermost then
+    t.move_outermost()
+  end
 
   set_current_node(t.current())
   keybind(t)
   M.on = true
 end
-
 
 local function keybind_global(opts)
   local function toggle(outermost)
@@ -372,13 +364,23 @@ local function keybind_global(opts)
     end
   end
 
-  vim.keymap.set('n', opts.keymaps.toggle, toggle(false), { desc = "tshjkl toggle" })
-  vim.keymap.set('n', opts.keymaps.toggle_outer, toggle(true), { desc = "tshjkl toggle_outer" })
+  vim.keymap.set(
+    'n',
+    opts.keymaps.toggle,
+    toggle(false),
+    { desc = 'tshjkl toggle' }
+  )
+  vim.keymap.set(
+    'n',
+    opts.keymaps.toggle_outer,
+    toggle(true),
+    { desc = 'tshjkl toggle_outer' }
+  )
 
   if M.opts.select_current_node then
     vim.api.nvim_create_autocmd('ModeChanged', {
       pattern = 'v:*',
-      callback = visual_mode_leave.handle_exit_visual
+      callback = visual_mode_leave.handle_exit_visual,
     })
   end
 end
@@ -386,17 +388,15 @@ end
 M.did_setup = false
 
 function M._plugin_setup()
-  if M.did_setup then return end
+  if M.did_setup then
+    return
+  end
 
   M.setup()
 end
 
 function M.setup(opts)
-  M.opts = vim.tbl_deep_extend(
-    'force',
-    default_config,
-    opts or {}
-  )
+  M.opts = vim.tbl_deep_extend('force', default_config, opts or {})
 
   keybind_global(M.opts)
 
