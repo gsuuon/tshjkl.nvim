@@ -4,7 +4,7 @@ local nav = require('tshjkl.nav')
 local M = {}
 
 local default_config = {
-  -- false to highlight only.
+  -- false to highlight only. Note that enabling this will hide the highlighting of child nodes
   select_current_node = true,
   keymaps = {
     toggle = '<M-v>',
