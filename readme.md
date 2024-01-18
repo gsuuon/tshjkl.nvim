@@ -47,6 +47,8 @@ You can override the [default config](lua/tshjkl/init.lua) with lazy `opts`:
 {
   'gsuuon/tshjkl.nvim',
   opts = {
+    -- false to highlight only.
+    select_current_node = true,
     keymaps = {
       toggle = '<leader>ct',
     },
