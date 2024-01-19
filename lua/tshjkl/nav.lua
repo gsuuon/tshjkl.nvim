@@ -16,13 +16,17 @@ M.op = op
 local named_sib_ops = {
   [op.first] = function(node)
     local parent = node:parent()
-    if parent == nil then return end
+    if parent == nil then
+      return
+    end
 
     return parent:named_child(0)
   end,
   [op.last] = function(node)
     local parent = node:parent()
-    if parent == nil then return end
+    if parent == nil then
+      return
+    end
 
     return parent:named_child(parent:named_child_count() - 1)
   end,
@@ -31,20 +35,24 @@ local named_sib_ops = {
   end,
   [op.prev] = function(node)
     return node:prev_named_sibling()
-  end
+  end,
 }
 
 ---@type OpTable
 local unnamed_sib_ops = {
-  [op.first] = function (node)
+  [op.first] = function(node)
     local parent = node:parent()
-    if parent == nil then return end
+    if parent == nil then
+      return
+    end
 
     return parent:child(0)
   end,
   [op.last] = function(node)
     local parent = node:parent()
-    if parent == nil then return end
+    if parent == nil then
+      return
+    end
 
     return parent:child(parent:child_count() - 1)
   end,
@@ -53,13 +61,17 @@ local unnamed_sib_ops = {
   end,
   [op.prev] = function(node)
     return node:prev_sibling()
-  end
+  end,
 }
 
 local named = true
 ---@param named_ boolean
-function M.set_named_mode(named_) named = named_ end
-function M.is_named_mode() return named end
+function M.set_named_mode(named_)
+  named = named_
+end
+function M.is_named_mode()
+  return named
+end
 
 ---@param node TSNode
 ---@param op_ Op
@@ -92,4 +104,3 @@ function M.parent(node)
 end
 
 return M
-
