@@ -89,6 +89,8 @@ use {
 }
 ```
 
+The default options will visual select the current node - since the visual highlight will render over other highlights, you won't see the child extmarks. If you prefer to see those, set `select_current_node = false` and use the `v` keybind in ts-mode to manually select the current node instead.
+
 ## Keymaps
 Check [binds](https://github.com/gsuuon/tshjkl.nvim/blob/9c608e4a70c69a4ab0e01f22a2f507106491c4af/lua/tshjkl/init.lua#L326) for more
 
