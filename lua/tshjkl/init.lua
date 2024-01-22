@@ -3,6 +3,28 @@ local nav = require('tshjkl.nav')
 
 local M = {}
 
+---@class TshjklKeymaps
+---@field toggle any
+---@field toggle_outer any
+---@field parent any
+---@field next any
+---@field prev any
+---@field child any
+---@field toggle_named any
+
+---@class TshjklMarks
+---@field parent table
+---@field child table
+---@field next table
+---@field prev table
+---@field current table
+
+---@class TshjklConfig
+---@field select_current_node boolean
+---@field keymaps TshjklKeymaps
+---@field marks TshjklMarks
+
+---@type TshjklConfig
 local default_config = {
   -- false to highlight only. Note that enabling this will hide the highlighting of child nodes
   select_current_node = true,
