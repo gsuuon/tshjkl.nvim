@@ -3,6 +3,28 @@ local nav = require('tshjkl.nav')
 
 local M = {}
 
+---@class TshjklKeymaps
+---@field toggle any
+---@field toggle_outer any
+---@field parent any
+---@field next any
+---@field prev any
+---@field child any
+---@field toggle_named any
+
+---@class TshjklMarks
+---@field parent table
+---@field child table
+---@field next table
+---@field prev table
+---@field current table
+
+---@class TshjklConfig
+---@field select_current_node boolean
+---@field keymaps TshjklKeymaps
+---@field marks TshjklMarks
+
+---@type TshjklConfig
 local default_config = {
   -- false to highlight only. Note that enabling this will hide the highlighting of child nodes
   select_current_node = true,
@@ -61,6 +83,11 @@ local visual_mode_leave = (function()
   }
 end)()
 
+---@alias Point { row: number, col: number }
+---@alias NodePosition { start: Point, stop: Point }
+
+---@param pos NodePosition
+---@return nil
 local function select_position(pos)
   local keys = pos.start.row + 1 .. 'G0'
 
@@ -89,6 +116,9 @@ local function clear_positions()
   vim.api.nvim_buf_clear_namespace(0, M.ns, 0, -1)
 end
 
+---@param pos NodePosition
+---@param name string
+---@return nil
 local function show_position(pos, name)
   if M.marks[name] ~= nil then
     vim.api.nvim_buf_del_extmark(0, M.ns, M.marks[name])
@@ -107,6 +137,8 @@ local function show_position(pos, name)
   )
 end
 
+---@param node TSNode | nil
+---@return NodePosition
 local function node_position(node)
   local start_row, start_col, stop_row, stop_col = node:range()
 
@@ -122,6 +154,9 @@ local function node_position(node)
   }
 end
 
+---@param node TSNode | nil
+---@param name string
+---@return nil
 local function show_node(node, name)
   if node == nil then
     return
@@ -130,6 +165,7 @@ local function show_node(node, name)
   show_position(node_position(node), name)
 end
 
+---@type TSNode | nil
 M.current_node = nil
 
 local winbar = (function()
@@ -155,6 +191,8 @@ local winbar = (function()
   }
 end)()
 
+---@param node TSNode | nil
+---@return nil
 local function set_current_node(node)
   if node == nil then
     return
@@ -204,6 +242,7 @@ end
 
 M.exit = exit
 
+---@param t Trail
 local function keybind(t)
   M.keys = {}
 
@@ -341,8 +380,12 @@ local function keybind(t)
   bind(M.opts.keymaps.toggle_named, toggle_named)
 end
 
+---@param outermost boolean
 local function enter(outermost)
   local t = trail.start()
+  if t == nil then
+    return
+  end
 
   if outermost then
     t.move_outermost()
@@ -354,6 +397,8 @@ local function enter(outermost)
 end
 
 local function keybind_global(opts)
+  ---@param outermost boolean
+  ---@return fun(): nil
   local function toggle(outermost)
     return function()
       if M.on then
