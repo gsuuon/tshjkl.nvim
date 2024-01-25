@@ -2,6 +2,10 @@
 
 Tree-sitter `hjkl` mode
 
+<a href="https://dotfyle.com/plugins/gsuuon/tshjkl.nvim">
+  <img src="https://dotfyle.com/plugins/gsuuon/tshjkl.nvim/shield?style=flat" />
+</a>
+
 ![image](https://github.com/gsuuon/tshjkl.nvim/assets/6422188/e1942195-dd08-44e8-9db3-2209a4ea4943)
 
 ## Usage
