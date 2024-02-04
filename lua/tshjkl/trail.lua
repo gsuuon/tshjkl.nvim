@@ -7,6 +7,15 @@ local M = {}
 ---@field parent? Node
 ---@field child? Node
 
+---@class Trail
+---@field from_child_to_parent fun(): TSNode | nil
+---@field from_parent_to_child fun(): TSNode | nil
+---@field from_sib_to_sib fun(op: Op): TSNode | nil
+---@field current fun(): TSNode | nil
+---@field move_innermost fun(): TSNode | nil
+---@field move_outermost fun(): TSNode | nil
+
+---@return Trail | nil
 function M.start()
   local node = vim.treesitter.get_node()
   if node == nil then
@@ -16,6 +25,7 @@ function M.start()
   ---@type Node
   local current = { node = node }
 
+  ---@return TSNode | nil
   local function from_child_to_parent()
     local parent = nav.parent(current.node)
     if parent == nil then
@@ -33,6 +43,7 @@ function M.start()
     return current.node
   end
 
+  ---@return TSNode | nil
   local function from_parent_to_child()
     if current.child == nil then
       local child = nav.child(current.node)
@@ -52,6 +63,7 @@ function M.start()
   end
 
   ---@param op Op
+  ---@return TSNode | nil
   local function from_sib_to_sib(op)
     local sibling = nav.sibling(current.node, op)
     if sibling == nil then
@@ -65,6 +77,7 @@ function M.start()
     return current.node
   end
 
+  ---@return TSNode | nil
   local function move_outermost()
     local parent = nav.parent(current.node)
 
@@ -77,6 +90,7 @@ function M.start()
     return from_parent_to_child()
   end
 
+  ---@return TSNode | nil
   local function move_innermost()
     while current.child ~= nil do
       current = current.child

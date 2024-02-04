@@ -22,6 +22,7 @@ local named_sib_ops = {
 
     return parent:named_child(0)
   end,
+
   [op.last] = function(node)
     local parent = node:parent()
     if parent == nil then
@@ -30,9 +31,11 @@ local named_sib_ops = {
 
     return parent:named_child(parent:named_child_count() - 1)
   end,
+
   [op.next] = function(node)
     return node:next_named_sibling()
   end,
+
   [op.prev] = function(node)
     return node:prev_named_sibling()
   end,
@@ -48,6 +51,7 @@ local unnamed_sib_ops = {
 
     return parent:child(0)
   end,
+
   [op.last] = function(node)
     local parent = node:parent()
     if parent == nil then
@@ -56,19 +60,24 @@ local unnamed_sib_ops = {
 
     return parent:child(parent:child_count() - 1)
   end,
+
   [op.next] = function(node)
     return node:next_sibling()
   end,
+
   [op.prev] = function(node)
     return node:prev_sibling()
   end,
 }
 
 local named = true
+
 ---@param named_ boolean
+---@return nil
 function M.set_named_mode(named_)
   named = named_
 end
+
 function M.is_named_mode()
   return named
 end
@@ -83,6 +92,7 @@ function M.sibling(node, op_)
   end
 end
 
+---@param node TSNode
 function M.child(node)
   if named then
     return node:named_child(0)
@@ -91,6 +101,7 @@ function M.child(node)
   end
 end
 
+---@param node TSNode
 function M.parent(node)
   if named then
     local parent_ = node:parent()
