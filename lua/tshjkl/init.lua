@@ -137,7 +137,7 @@ local function show_position(pos, name)
   )
 end
 
----@param node TSNode | nil
+---@param node TSNode
 ---@return NodePosition
 local function node_position(node)
   local start_row, start_col, stop_row, stop_col = node:range()
@@ -181,8 +181,8 @@ local winbar = (function()
       end
 
       vim.wo.winbar = pre()
-        .. ' ∙ '
-        .. (M.current_node and M.current_node:type() or '')
+          .. ' ∙ '
+          .. (M.current_node and M.current_node:type() or '')
     end,
     close = function()
       vim.wo.winbar = original
@@ -229,13 +229,13 @@ end
 
 M.on = false
 
-local function exit()
+local function exit(enter_normal_mode)
   clear_positions()
   unkeybind()
   winbar.close()
   M.on = false
 
-  if M.opts.select_current_node then
+  if M.opts.select_current_node and enter_normal_mode then
     vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<Esc>', true, false, true))
   end
 end
@@ -363,6 +363,8 @@ local function keybind(t)
     winbar.update()
   end
 
+  bind(M.opts.keymaps.toggle, function() exit(true) end)
+  bind(M.opts.keymaps.toggle_outer, function() exit(true) end)
   bind(M.opts.keymaps.next, next)
   bind(M.opts.keymaps.prev, prev)
   bind(M.opts.keymaps.parent, parent)
@@ -397,28 +399,17 @@ local function enter(outermost)
 end
 
 local function keybind_global(opts)
-  ---@param outermost boolean
-  ---@return fun(): nil
-  local function toggle(outermost)
-    return function()
-      if M.on then
-        exit()
-      else
-        enter(outermost)
-      end
-    end
-  end
-
   vim.keymap.set(
     'n',
     opts.keymaps.toggle,
-    toggle(false),
+    enter,
     { desc = 'tshjkl toggle' }
   )
+
   vim.keymap.set(
     'n',
     opts.keymaps.toggle_outer,
-    toggle(true),
+    function() enter(true) end,
     { desc = 'tshjkl toggle_outer' }
   )
 
