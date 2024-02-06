@@ -24,7 +24,6 @@ local M = {}
 ---@field keymaps TshjklKeymaps
 ---@field marks TshjklMarks
 
-
 ---@type TshjklConfig
 local default_config = {
   -- false to highlight only. Note that enabling this will hide the highlighting of child nodes
@@ -182,8 +181,8 @@ local winbar = (function()
       end
 
       vim.wo.winbar = pre()
-          .. ' ∙ '
-          .. (M.current_node and M.current_node:type() or '')
+        .. ' ∙ '
+        .. (M.current_node and M.current_node:type() or '')
     end,
     close = function()
       vim.wo.winbar = original
@@ -364,8 +363,12 @@ local function keybind(t)
     winbar.update()
   end
 
-  bind(M.opts.keymaps.toggle, function() exit(true) end)
-  bind(M.opts.keymaps.toggle_outer, function() exit(true) end)
+  bind(M.opts.keymaps.toggle, function()
+    exit(true)
+  end)
+  bind(M.opts.keymaps.toggle_outer, function()
+    exit(true)
+  end)
   bind(M.opts.keymaps.next, next)
   bind(M.opts.keymaps.prev, prev)
   bind(M.opts.keymaps.parent, parent)
@@ -400,19 +403,11 @@ local function enter(outermost)
 end
 
 local function keybind_global(opts)
-  vim.keymap.set(
-    'n',
-    opts.keymaps.toggle,
-    enter,
-    { desc = 'tshjkl toggle' }
-  )
+  vim.keymap.set('n', opts.keymaps.toggle, enter, { desc = 'tshjkl toggle' })
 
-  vim.keymap.set(
-    'n',
-    opts.keymaps.toggle_outer,
-    function() enter(true) end,
-    { desc = 'tshjkl toggle_outer' }
-  )
+  vim.keymap.set('n', opts.keymaps.toggle_outer, function()
+    enter(true)
+  end, { desc = 'tshjkl toggle_outer' })
 
   if M.opts.select_current_node then
     vim.api.nvim_create_autocmd('ModeChanged', {
