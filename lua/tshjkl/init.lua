@@ -4,25 +4,26 @@ local nav = require('tshjkl.nav')
 local M = {}
 
 ---@class TshjklKeymaps
----@field toggle any
----@field toggle_outer any
----@field parent any
----@field next any
----@field prev any
----@field child any
----@field toggle_named any
+---@field toggle string
+---@field toggle_outer string
+---@field parent string
+---@field next string
+---@field prev string
+---@field child string
+---@field toggle_named string
 
 ---@class TshjklMarks
----@field parent table
----@field child table
----@field next table
----@field prev table
----@field current table
+---@field parent vim.api.keyset.set_extmark
+---@field child vim.api.keyset.set_extmark
+---@field next vim.api.keyset.set_extmark
+---@field prev vim.api.keyset.set_extmark
+---@field current vim.api.keyset.set_extmark
 
 ---@class TshjklConfig
 ---@field select_current_node boolean
 ---@field keymaps TshjklKeymaps
 ---@field marks TshjklMarks
+
 
 ---@type TshjklConfig
 local default_config = {
