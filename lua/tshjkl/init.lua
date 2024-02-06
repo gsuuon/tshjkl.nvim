@@ -4,20 +4,20 @@ local nav = require('tshjkl.nav')
 local M = {}
 
 ---@class TshjklKeymaps
----@field toggle any
----@field toggle_outer any
----@field parent any
----@field next any
----@field prev any
----@field child any
----@field toggle_named any
+---@field toggle string
+---@field toggle_outer string
+---@field parent string
+---@field next string
+---@field prev string
+---@field child string
+---@field toggle_named string
 
 ---@class TshjklMarks
----@field parent table
----@field child table
----@field next table
----@field prev table
----@field current table
+---@field parent vim.api.keyset.set_extmark
+---@field child vim.api.keyset.set_extmark
+---@field next vim.api.keyset.set_extmark
+---@field prev vim.api.keyset.set_extmark
+---@field current vim.api.keyset.set_extmark
 
 ---@class TshjklConfig
 ---@field select_current_node boolean
@@ -137,7 +137,7 @@ local function show_position(pos, name)
   )
 end
 
----@param node TSNode | nil
+---@param node TSNode
 ---@return NodePosition
 local function node_position(node)
   local start_row, start_col, stop_row, stop_col = node:range()
@@ -229,13 +229,13 @@ end
 
 M.on = false
 
-local function exit()
+local function exit(enter_normal_mode)
   clear_positions()
   unkeybind()
   winbar.close()
   M.on = false
 
-  if M.opts.select_current_node then
+  if M.opts.select_current_node and enter_normal_mode then
     vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<Esc>', true, false, true))
   end
 end
@@ -363,6 +363,12 @@ local function keybind(t)
     winbar.update()
   end
 
+  bind(M.opts.keymaps.toggle, function()
+    exit(true)
+  end)
+  bind(M.opts.keymaps.toggle_outer, function()
+    exit(true)
+  end)
   bind(M.opts.keymaps.next, next)
   bind(M.opts.keymaps.prev, prev)
   bind(M.opts.keymaps.parent, parent)
@@ -397,30 +403,11 @@ local function enter(outermost)
 end
 
 local function keybind_global(opts)
-  ---@param outermost boolean
-  ---@return fun(): nil
-  local function toggle(outermost)
-    return function()
-      if M.on then
-        exit()
-      else
-        enter(outermost)
-      end
-    end
-  end
+  vim.keymap.set('n', opts.keymaps.toggle, enter, { desc = 'tshjkl toggle' })
 
-  vim.keymap.set(
-    'n',
-    opts.keymaps.toggle,
-    toggle(false),
-    { desc = 'tshjkl toggle' }
-  )
-  vim.keymap.set(
-    'n',
-    opts.keymaps.toggle_outer,
-    toggle(true),
-    { desc = 'tshjkl toggle_outer' }
-  )
+  vim.keymap.set('n', opts.keymaps.toggle_outer, function()
+    enter(true)
+  end, { desc = 'tshjkl toggle_outer' })
 
   if M.opts.select_current_node then
     vim.api.nvim_create_autocmd('ModeChanged', {

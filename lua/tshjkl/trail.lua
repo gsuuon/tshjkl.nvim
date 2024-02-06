@@ -11,19 +11,19 @@ local M = {}
 ---@field from_child_to_parent fun(): TSNode | nil
 ---@field from_parent_to_child fun(): TSNode | nil
 ---@field from_sib_to_sib fun(op: Op): TSNode | nil
----@field current fun(): TSNode | nil
+---@field current fun(): TSNode
 ---@field move_innermost fun(): TSNode | nil
 ---@field move_outermost fun(): TSNode | nil
 
 ---@return Trail | nil
 function M.start()
-  local node = vim.treesitter.get_node()
-  if node == nil then
+  local start_node = vim.treesitter.get_node()
+  if start_node == nil then
     return
   end
 
   ---@type Node
-  local current = { node = node }
+  local current = { node = start_node }
 
   ---@return TSNode | nil
   local function from_child_to_parent()
@@ -32,7 +32,7 @@ function M.start()
       return
     end
 
-    if current.parent == nil or current.parent.node ~= node then
+    if current.parent == nil or current.parent.node ~= start_node then
       current.parent = {
         node = parent,
         child = current,
@@ -40,6 +40,8 @@ function M.start()
     end
 
     current = current.parent
+    ---@cast current -nil
+
     return current.node
   end
 
@@ -59,6 +61,8 @@ function M.start()
     end
 
     current = current.child
+    ---@cast current -nil
+
     return current.node
   end
 
@@ -90,11 +94,15 @@ function M.start()
     return from_parent_to_child()
   end
 
-  ---@return TSNode | nil
+  ---@return TSNode
   local function move_innermost()
-    while current.child ~= nil do
-      current = current.child
+    local current_child = current
+
+    while current_child ~= nil do
+      current_child = current_child.child
     end
+
+    current = current_child
 
     return current.node
   end
