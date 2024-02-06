@@ -19,7 +19,7 @@ jobs:
           # selene arguments
           args: --display-style=quiet .
           # selene version
-          version: 0.12.1
+          version: 0.26.1
   stylua:
     name: stylua
     runs-on: ubuntu-latest
