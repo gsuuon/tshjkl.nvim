@@ -14,6 +14,7 @@ local M = {}
 ---@field current fun(): TSNode
 ---@field move_innermost fun(): TSNode | nil
 ---@field move_outermost fun(): TSNode | nil
+---@field set_current_node fun(tsnode: TSNode) : nil
 
 ---@return Trail | nil
 function M.start()
@@ -99,10 +100,9 @@ function M.start()
     local current_child = current
 
     while current_child ~= nil do
+      current = current_child
       current_child = current_child.child
     end
-
-    current = current_child
 
     return current.node
   end
@@ -116,6 +116,20 @@ function M.start()
     end,
     move_innermost = move_innermost,
     move_outermost = move_outermost,
+
+    --- Set current - this will reset the trail tree unless we set to the same node
+    ---@param tsnode TSNode
+    set_current_node = function(tsnode)
+      if tsnode ~= current.node then
+        start_node = tsnode
+
+        current = {
+          node = tsnode,
+        }
+      end
+
+      return current
+    end,
   }
 end
 

@@ -69,7 +69,20 @@ You can override the [default config](lua/tshjkl/init.lua) with lazy `opts`:
         virt_text = { {'j', 'ModeMsg'} },
         virt_text_pos = 'overlay'
       }
-    }
+    },
+    binds = function(bind, tshjkl)
+      bind('<Esc>', function()
+        tshjkl.exit(true)
+      end)
+
+      bind('q', function()
+        tshjkl.exit(true)
+      end)
+
+      bind('t', function()
+        print(tshjkl.current_node():type())
+      end)
+    end,
   }
 }
 ```
@@ -107,6 +120,28 @@ Check [binds](https://github.com/gsuuon/tshjkl.nvim/blob/9c608e4a70c69a4ab0e01f2
 `K` — first sibling  
 `L` — inner-most child  
 
+### Binds
+You can bind additional keys for 'tshjkl' mode with the `binds` option. This takes a function of which takes `bind` and `tshjkl` - bind lets you bind additional keys, and tshjkl exposes `tshjkl.current_node()`, `tshjkl.set_node()` and `tshjkl.exit()`. Pass `true` to `tshjkl.exit` to drop to normal mode (if `select_current_node` is true).
+
+You can also add binds per buffer by setting `vim.b.tshjkl_binds`, for example in `ftplugin/lua.lua`:
+```lua
+vim.b.tshjkl_binds = function(bind, tshjkl)
+  bind('f', function()
+    local node = tshjkl.current_node()
+
+    while node do
+      local type = node:type()
+
+      if type:match('function_de') then -- declaration or definition
+        tshjkl.set_node(node)
+        return
+      end
+
+      node = node:parent()
+    end
+  end)
+end
+```
 
 ## Motivation
 This plugin makes it easier to work with tree-sitter nodes - I've found it often surprising which node is under the cursor so I want to make navigating nodes as easy as basic navigation in Neovim. Visual select by default lets you do normal operations without too much extra thought - this just helps you easily select the node you're interested in.

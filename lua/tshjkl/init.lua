@@ -19,10 +19,13 @@ local M = {}
 ---@field prev vim.api.keyset.set_extmark
 ---@field current vim.api.keyset.set_extmark
 
+---@alias Binds fun(bind: fun(lhs: string, rhs: fun(t: Trail): nil), tshjkl: {exit: fun(drop_to_normal?: boolean), set_node: (fun(node: TSNode): nil), current_node: fun(): TSNode})
+
 ---@class TshjklConfig
 ---@field select_current_node boolean
 ---@field keymaps TshjklKeymaps
 ---@field marks TshjklMarks
+---@field binds? Binds
 
 ---@type TshjklConfig
 local default_config = {
@@ -57,6 +60,15 @@ local default_config = {
       hl_group = 'Substitute',
     },
   },
+  binds = function(bind, tshjkl)
+    bind('<Esc>', function()
+      tshjkl.exit(true)
+    end)
+
+    bind('q', function()
+      tshjkl.exit(true)
+    end)
+  end,
 }
 
 M.ns = vim.api.nvim_create_namespace('tshjkl')
@@ -243,7 +255,8 @@ end
 M.exit = exit
 
 ---@param t Trail
-local function keybind(t)
+---@param binds? Binds
+local function keybind(t, binds)
   M.keys = {}
 
   local function bind(key, fn)
@@ -377,13 +390,32 @@ local function keybind(t)
   bind('L', innermost)
   bind('b', visual_select_back)
   bind('v', visual_select)
-  bind('a', append)
+  bind('a', append) -- I don't think these work with select_current_node
   bind('i', prepend)
   bind('o', open_below)
   bind('<S-o>', open_above)
   bind('<S-j>', last_sibling)
   bind('<S-k>', first_sibling)
   bind(M.opts.keymaps.toggle_named, toggle_named)
+
+  local binds_api = {
+    exit = exit,
+    current_node = function()
+      return t.current()
+    end,
+    set_node = function(node)
+      t.set_current_node(node)
+      set_current_node(node)
+    end,
+  }
+
+  if binds then
+    binds(bind, binds_api)
+  end
+
+  if vim.b.tshjkl_binds then
+    vim.b.tshjkl_binds(bind, binds_api)
+  end
 end
 
 ---@param outermost boolean
@@ -398,7 +430,7 @@ local function enter(outermost)
   end
 
   set_current_node(t.current())
-  keybind(t)
+  keybind(t, M.opts.binds)
   M.on = true
 end
 
