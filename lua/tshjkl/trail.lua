@@ -18,8 +18,8 @@ local M = {}
 
 ---@return Trail | nil
 function M.start()
-  local start_node = vim.treesitter.get_node()
-  if start_node == nil then
+  local ok, start_node = pcall(vim.treesitter.get_node)
+  if not ok then
     return
   end
 
