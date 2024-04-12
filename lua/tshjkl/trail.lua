@@ -20,6 +20,7 @@ local M = {}
 function M.start()
   local ok, start_node = pcall(vim.treesitter.get_node)
   if not ok then
+    vim.notify('Treesitter node not found', vim.log.levels.ERROR)
     return
   end
 
