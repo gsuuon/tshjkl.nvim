@@ -92,8 +92,7 @@ function M.sibling(node, op_)
   end
 end
 
----@param node TSNode
-function M.child(node)
+local function child_same_tree(node)
   if named then
     return node:named_child(0)
   else
@@ -102,7 +101,22 @@ function M.child(node)
 end
 
 ---@param node TSNode
-function M.parent(node)
+function M.child(node)
+  local tree_child = child_same_tree(node)
+
+  if tree_child then
+    return tree_child
+  end
+
+  -- try to get an injected node
+  local injected = vim.treesitter.get_node({ ignore_injections = false })
+
+  if injected and injected:tree() ~= node:tree() then
+    return injected
+  end
+end
+
+local function parent_same_tree(node)
   if named then
     local parent_ = node:parent()
     while parent_ and not parent_:named() do
@@ -111,6 +125,21 @@ function M.parent(node)
     return parent_
   else
     return node:parent()
+  end
+end
+
+---@param node TSNode
+function M.parent(node)
+  local tree_parent = parent_same_tree(node)
+
+  if tree_parent then
+    return tree_parent
+  end
+
+  -- try to get top-level node at cursor instead
+  local top_level = vim.treesitter.get_node()
+  if top_level and top_level:tree() ~= node:tree() then
+    return top_level
   end
 end
 

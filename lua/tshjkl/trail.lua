@@ -18,7 +18,9 @@ local M = {}
 
 ---@return Trail | nil
 function M.start()
-  local ok, start_node = pcall(vim.treesitter.get_node)
+  local ok, start_node =
+    pcall(vim.treesitter.get_node, { ignore_injections = false })
+
   if not ok then
     vim.notify('Treesitter node not found', vim.log.levels.ERROR)
     return
