@@ -107,10 +107,11 @@ local function select_position(pos)
     keys = keys .. pos.start.col .. 'l'
   end
 
-  keys = keys .. 'v' .. pos.stop.row + 1 .. 'G0'
-
   if pos.stop.col > 0 then
+    keys = keys .. 'v' .. pos.stop.row + 1 .. 'G0'
     keys = keys .. pos.stop.col - 1 .. 'l'
+  else
+    keys = keys .. 'v' .. pos.stop.row .. 'G$'
   end
 
   vim.api.nvim_feedkeys(
