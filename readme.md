@@ -105,9 +105,9 @@ use {
 The default options will visual select the current node - since the visual highlight will render over other highlights, you won't see the child extmarks. If you prefer to see those, set `select_current_node = false` and use the `v` keybind in ts-mode to manually select the current node instead.
 
 ## Keymaps
-Check [binds](https://github.com/gsuuon/tshjkl.nvim/blob/9c608e4a70c69a4ab0e01f22a2f507106491c4af/lua/tshjkl/init.lua#L326) for more
+These keymaps are added when `tshjkl` is toggled on. Check [binds](./lua/tshjkl/init.lua#L437) for more.
 
-`v` — visual select the current node (if `config.select_current_node` is false)  
+`v` — enter node-wise visual mode if `select_current_node` is true, else visual select the current node  
 `b` — visual select backwards  
 
 `h` — parent  
@@ -121,7 +121,7 @@ Check [binds](https://github.com/gsuuon/tshjkl.nvim/blob/9c608e4a70c69a4ab0e01f2
 `L` — inner-most child  
 
 ### Binds
-You can bind additional keys for 'tshjkl' mode with the `binds` option. This takes a function of which takes `bind` and `tshjkl` - bind lets you bind additional keys, and tshjkl exposes `tshjkl.current_node()`, `tshjkl.set_node()` and `tshjkl.exit()`. Pass `true` to `tshjkl.exit` to drop to normal mode (if `select_current_node` is true).
+You can bind additional keys for 'tshjkl' mode with the `binds` option. This takes a function which takes `bind` and `tshjkl` - bind lets you bind additional keys, and tshjkl exposes `tshjkl.current_node()`, `tshjkl.set_node()` and `tshjkl.exit()`. Pass `true` to `tshjkl.exit` to drop to normal mode (if `select_current_node` is true).
 
 You can also add binds per buffer by setting `vim.b.tshjkl_binds`, for example in `ftplugin/lua.lua`:
 ```lua
