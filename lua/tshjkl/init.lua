@@ -181,20 +181,21 @@ end
 ---@type TSNode | nil
 M.current_node = nil
 
-local winbar = (function()
+local winbar
+do
   local original
-  local function pre()
-    return nav.is_named_mode() and 'TSMode' or 'TSMode (all)'
-  end
 
-  return {
+  winbar = {
     update = function()
       if original == nil then
         original = vim.wo.winbar
       end
 
-      vim.wo.winbar = pre()
-        .. ' ∙ '
+      vim.wo.winbar = '-- '
+        .. (M.nodewise_start_position and 'VISUAL ' or '')
+        .. (nav.is_named_mode() and 'NODE ' or 'NODE(all) ')
+        .. (M.opts.select_current_node and 'SELECT ' or '')
+        .. '-- '
         .. (M.current_node and M.current_node:type() or '')
     end,
     close = function()
@@ -202,7 +203,44 @@ local winbar = (function()
       original = nil
     end,
   }
-end)()
+end
+
+---@param a NodePosition
+---@param b NodePosition
+local function join_positions(a, b)
+  ---@param a Point
+  ---@param b Point
+  local function compare(a, b)
+    if a.row ~= b.row then
+      return a.row < b.row
+    end
+
+    if a.col ~= b.col then
+      return a.col < b.col
+    end
+
+    return false
+  end
+
+  local earliest_first
+  do
+    local positions = {
+      a.start,
+      a.stop,
+      b.start,
+      b.stop,
+    }
+
+    table.sort(positions, compare)
+
+    earliest_first = positions
+  end
+
+  return {
+    start = earliest_first[1],
+    stop = earliest_first[4],
+  }
+end
 
 ---@param node TSNode | nil
 ---@return nil
@@ -223,7 +261,13 @@ local function set_current_node(node)
   show_node(nav.sibling(node, nav.op.prev), 'prev')
 
   if M.opts.select_current_node then
-    select_position(pos)
+    if M.nodewise_start_position ~= nil then
+      local union = join_positions(pos, M.nodewise_start_position)
+
+      select_position(union)
+    else
+      select_position(pos)
+    end
   else
     show_node(node, 'current')
     show_node(nav.child(node), 'child')
@@ -251,6 +295,9 @@ local function exit(enter_normal_mode)
   if M.opts.select_current_node and enter_normal_mode then
     vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<Esc>', true, false, true))
   end
+
+  M.current_node = nil
+  M.nodewise_start_position = nil
 end
 
 M.exit = exit
@@ -319,6 +366,16 @@ local function keybind(t, binds)
     })
 
     exit()
+  end
+
+  local function nodewise_visual()
+    if M.nodewise_start_position then
+      exit()
+    else
+      local n = t.current()
+      M.nodewise_start_position = node_position(n)
+      winbar.update()
+    end
   end
 
   local function append()
@@ -390,7 +447,7 @@ local function keybind(t, binds)
   bind('H', outermost)
   bind('L', innermost)
   bind('b', visual_select_back)
-  bind('v', visual_select)
+  bind('v', M.opts.select_current_node and nodewise_visual or visual_select)
   bind('a', append) -- I don't think these work with select_current_node
   bind('i', prepend)
   bind('o', open_below)
