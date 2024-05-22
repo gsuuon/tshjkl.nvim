@@ -5,10 +5,15 @@ Tree-sitter `hjkl` mode
 ![image](https://github.com/gsuuon/tshjkl.nvim/assets/6422188/e1942195-dd08-44e8-9db3-2209a4ea4943)
 
 ## Usage
-Toggle into `tshjkl` mode, then use `hjkl` to change scope or select a sibling node. Toggle is mapped to `<M-v>` (`Alt-v`) and nodes are visually selected by default. Toggle, movement keys, extmark highlights and select mode can be configured - check [init.lua](lua/tshjkl/init.lua) to see configuration and defaults. 
+Toggle into `tshjkl` mode, then use `hjkl` to change scope or select a sibling node. Toggle is mapped to `<M-v>` (`Alt-v`) and nodes are visually selected by default. Toggle, movement keys, extmark highlights and select mode can be configured - check [init.lua](lua/tshjkl/init.lua) to see configuration and defaults.
 
 ### Demo
 https://github.com/gsuuon/tshjkl.nvim/assets/6422188/58944f74-efab-4db8-bf51-d659f35c5759
+
+You can use `v` again with tshjkl toggled on to enter something like a nodewise-visual mode which works like charwise-visual.
+
+https://github.com/gsuuon/tshjkl.nvim/assets/6422188/dcfd7cd0-9a40-4105-85d3-aa2b82808022
+
 
 ### Example
 Unwrapping a function  
