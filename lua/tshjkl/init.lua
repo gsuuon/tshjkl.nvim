@@ -205,18 +205,18 @@ do
   }
 end
 
----@param a NodePosition
----@param b NodePosition
-local function join_positions(a, b)
-  ---@param a Point
-  ---@param b Point
-  local function compare(a, b)
-    if a.row ~= b.row then
-      return a.row < b.row
+---@param posA NodePosition
+---@param posB NodePosition
+local function join_positions(posA, posB)
+  ---@param pointA Point
+  ---@param pointB Point
+  local function compare(pointA, pointB)
+    if pointA.row ~= pointB.row then
+      return pointA.row < pointB.row
     end
 
-    if a.col ~= b.col then
-      return a.col < b.col
+    if pointA.col ~= pointB.col then
+      return pointA.col < pointB.col
     end
 
     return false
@@ -225,10 +225,10 @@ local function join_positions(a, b)
   local earliest_first
   do
     local positions = {
-      a.start,
-      a.stop,
-      b.start,
-      b.stop,
+      posA.start,
+      posA.stop,
+      posB.start,
+      posB.stop,
     }
 
     table.sort(positions, compare)
@@ -370,7 +370,8 @@ local function keybind(t, binds)
 
   local function nodewise_visual()
     if M.nodewise_start_position then
-      exit()
+      M.nodewise_start_position = nil
+      set_current_node(M.current_node) -- redraw
     else
       local n = t.current()
       M.nodewise_start_position = node_position(n)
