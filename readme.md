@@ -126,23 +126,23 @@ These keymaps are added when `tshjkl` is toggled on. Check [binds](./lua/tshjkl/
 `L` — inner-most child  
 
 ### Binds
-You can bind additional keys for 'tshjkl' mode with the `binds` option. This takes a function which takes `bind` and `tshjkl` - bind lets you bind additional keys, and tshjkl exposes `tshjkl.current_node()`, `tshjkl.set_node()` and `tshjkl.exit()`. Pass `true` to `tshjkl.exit` to drop to normal mode (if `select_current_node` is true).
+You can bind additional keys for 'tshjkl' mode with the `binds` option. This takes a function which takes `bind` and `tshjkl` - bind lets you bind additional keys, and tshjkl exposes `tshjkl.current_node()`, `tshjkl.set_node()`, `tshjkl.parent(node)` and `tshjkl.exit()`. Pass `true` to `tshjkl.exit` to drop to normal mode (if `select_current_node` is true).
 
 You can also add binds per buffer by setting `vim.b.tshjkl_binds`, for example in `ftplugin/lua.lua`:
 ```lua
 vim.b.tshjkl_binds = function(bind, tshjkl)
-  bind('f', function()
+  bind('m', function() -- content of markdown code block
     local node = tshjkl.current_node()
 
     while node do
       local type = node:type()
 
-      if type:match('function_de') then -- declaration or definition
+      if type == 'code_fence_content' then
         tshjkl.set_node(node)
         return
       end
 
-      node = node:parent()
+      node = tshjkl.parent(node)
     end
   end)
 end

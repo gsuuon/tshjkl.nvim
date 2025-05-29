@@ -136,7 +136,7 @@ function M.parent(node)
     return tree_parent
   end
 
-  -- try to get top-level node at cursor instead
+  -- try to get smallest node in top-level tree instead
   local top_level = vim.treesitter.get_node()
   if top_level and top_level:tree() ~= node:tree() then
     return top_level

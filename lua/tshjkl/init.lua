@@ -466,6 +466,7 @@ local function keybind(t, binds)
       t.set_current_node(node)
       set_current_node(node)
     end,
+    parent = nav.parent,
   }
 
   if binds then
